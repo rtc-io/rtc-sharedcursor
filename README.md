@@ -54,7 +54,7 @@ cursor.on('data', function(id, type, x, y) {
 Running the example in a few different windows, should display 
 something similar to what is shown below:
 
-![Screenshot](screenshot.png)
+![Screenshot](https://raw.github.com/rtc-io/rtc-sharedcursor/master/screenshot.png)
 
 ## License(s)
 
