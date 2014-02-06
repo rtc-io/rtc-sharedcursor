@@ -51,6 +51,11 @@ cursor.on('data', function(id, type, x, y) {
 });
 ```
 
+Running the example in a few different windows, should display 
+something similar to what is shown below:
+
+![Screenshot](screenshot.png)
+
 ## License(s)
 
 ### Apache 2.0
