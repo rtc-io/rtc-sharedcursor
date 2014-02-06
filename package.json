@@ -31,6 +31,6 @@
   },
   "dependencies": {
     "cog": "~0.5.1",
-    "point": "DamonOehlman/point#f65affe3df226c740b93ee0be616b47f6d7ab112"
+    "point": "~0.3.0"
   }
 }
