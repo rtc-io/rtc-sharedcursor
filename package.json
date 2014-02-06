@@ -1,6 +1,6 @@
 {
   "name": "rtc-sharedcursor",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "WebRTC P2P Shared Cursor Implementation via Data Channels (requires rtc-quickconnect)",
   "main": "index.js",
   "scripts": {
