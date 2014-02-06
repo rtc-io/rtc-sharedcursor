@@ -1,0 +1,35 @@
+{
+  "name": "rtc-sharedcursor",
+  "version": "0.0.0",
+  "description": "WebRTC P2P Shared Cursor Implementation via Data Channels (requires rtc-quickconnect)",
+  "main": "index.js",
+  "scripts": {
+    "test": "$(npm bin)/zuul -- test/all.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rtc-io/rtc-sharedcursor.git"
+  },
+  "keywords": [
+    "webrtc",
+    "rtc.io",
+    "datachannel",
+    "cursor",
+    "mouse",
+    "shared"
+  ],
+  "author": "Damon Oehlman <damon.oehlman@nicta.com.au>",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/rtc-io/rtc-sharedcursor/issues"
+  },
+  "homepage": "https://github.com/rtc-io/rtc-sharedcursor",
+  "devDependencies": {
+    "rtc-quickconnect": "~0.11.2",
+    "crel": "~1.1.1"
+  },
+  "dependencies": {
+    "cog": "~0.5.1",
+    "point": "DamonOehlman/point#f65affe3df226c740b93ee0be616b47f6d7ab112"
+  }
+}
