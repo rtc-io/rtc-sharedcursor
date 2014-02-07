@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "cog": "~0.5.1",
-    "point": "~0.3.0"
+    "point": "~0.3.0",
+    "rtc-bufferedchannel": "~0.4.0"
   }
 }

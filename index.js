@@ -1,6 +1,7 @@
 /* jshint node: true */
 'use strict';
 
+var bufferedchannel = require('rtc-bufferedchannel');
 var point = require('point');
 var EventEmitter = require('events').EventEmitter;
 var throttle = require('cog/throttle');
@@ -51,22 +52,20 @@ module.exports = function(qc, opts) {
   }
 
   function handleNewChannel(dc, id) {
-    channels.push(dc);
+    var channel = bufferedchannel(dc, { retry: false });
+
+    channels.push(channel);
     peers.push(id);
 
-    dc.onmessage = function(evt) {
-      var payload = evt.data && new Uint16Array(evt.data);
-
-      if (payload) {
-        emitter.emit(
-          'data',
-          id,
-          eventCodes[payload[0]],
-          (payload[1] / MAXVAL * targetWidth) | 0,
-          (payload[2] / MAXVAL * targetHeight) | 0
-        );
-      }
-    }
+    channel.on('data', function(payload) {
+      emitter.emit(
+        'data',
+        id,
+        eventCodes[payload[0]],
+        (payload[1] / MAXVAL * targetWidth) | 0,
+        (payload[2] / MAXVAL * targetHeight) | 0
+      );
+    });
   }
 
   function removeCursor(id) {
