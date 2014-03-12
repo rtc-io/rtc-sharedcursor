@@ -71,9 +71,6 @@ module.exports = function(qc, opts) {
   function removeCursor(id) {
   }
 
-  // listen for window resize events
-  window.addEventListener('resize', updateTargetBounds);
-
   // bind the attach function to the emitter
   emitter.attach = function(target) {
     var stop;
@@ -83,9 +80,6 @@ module.exports = function(qc, opts) {
 
     // update the current target
     currentTarget = target;
-
-    // get the current target size
-    updateTargetBounds();
 
     // listen for pointer events on the target
     stop = point(target, { over: true })(function(args) {
@@ -99,6 +93,9 @@ module.exports = function(qc, opts) {
 
       code = eventCodes.indexOf(args[2].type);
       if (code >= 0) {
+        // update the target bounds :(
+        updateTargetBounds();
+
         // calculate the relative x and y
         relX = (((args[0] - targetX) / targetWidth) * MAXVAL) | 0;
         relY = (((args[1] - targetY) / targetHeight) * MAXVAL) | 0;
