@@ -7,7 +7,7 @@ peers across a data channel connection.
 
 [![NPM](https://nodei.co/npm/rtc-sharedcursor.png)](https://nodei.co/npm/rtc-sharedcursor/)
 
-[![experimental](http://hughsk.github.io/stability-badges/dist/experimental.svg)](http://github.com/hughsk/stability-badges)
+![experimental](https://img.shields.io/badge/stability-experimental-red.svg)
 
 ## Example Usage
 
