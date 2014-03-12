@@ -41,14 +41,25 @@ module.exports = function(qc, opts) {
   var targetWidth = 0;
   var targetHeight = 0;
   var MAXVAL = Math.pow(2, 16) - 1;
+  var thottleDelay = (opts || {}).throttleDelay || 10;
 
   function updateTargetBounds() {
     var rect = currentTarget && currentTarget.getBoundingClientRect();
+    var offsetTarget = currentTarget;
 
-    targetX = rect ? rect.left : 0;
-    targetY = rect ? rect.top : 0;
+    // get the width and height from the client bounding rect
     targetWidth = rect ? rect.width : 0;
     targetHeight = rect ? rect.height : 0;
+
+    // get the offset from offsetLeft and offsetTop
+    targetX = 0;
+    targetY = 0;
+    while (offsetTarget) {
+      targetX += offsetTarget.offsetLeft;
+      targetY += offsetTarget.offsetTop;
+
+      offsetTarget = offsetTarget.offsetParent;
+    }
   }
 
   function handleNewChannel(dc, id) {
@@ -71,6 +82,35 @@ module.exports = function(qc, opts) {
   function removeCursor(id) {
   }
 
+  function takePoint(args) {
+    var code;
+    var relX;
+    var relY;
+
+    if (! args) {
+      return;
+    }
+
+    code = eventCodes.indexOf(args[2].type);
+    if (code >= 0) {
+      // update the target bounds :(
+      updateTargetBounds();
+
+      // calculate the relative x and y
+      relX = (((args[0] - targetX) / targetWidth) * MAXVAL) | 0;
+      relY = (((args[1] - targetY) / targetHeight) * MAXVAL) | 0;
+
+      channels.forEach(function(dc) {
+        // send the mouse data payload
+        dc.send(new Uint16Array([
+          code,
+          relX,
+          relY
+        ]));
+      })
+    }
+  }
+
   // bind the attach function to the emitter
   emitter.attach = function(target) {
     var stop;
@@ -82,34 +122,7 @@ module.exports = function(qc, opts) {
     currentTarget = target;
 
     // listen for pointer events on the target
-    stop = point(target, { over: true })(function(args) {
-      var code;
-      var relX;
-      var relY;
-
-      if (! args) {
-        return;
-      }
-
-      code = eventCodes.indexOf(args[2].type);
-      if (code >= 0) {
-        // update the target bounds :(
-        updateTargetBounds();
-
-        // calculate the relative x and y
-        relX = (((args[0] - targetX) / targetWidth) * MAXVAL) | 0;
-        relY = (((args[1] - targetY) / targetHeight) * MAXVAL) | 0;
-
-        channels.forEach(function(dc) {
-          // send the mouse data payload
-          dc.send(new Uint16Array([
-            code,
-            relX,
-            relY
-          ]));
-        })
-      }
-    });
+    stop = point(target, { over: true })(throttle(takePoint, thottleDelay));
 
     // patch in the detach handler
     emitter.detach = function() {
