@@ -100,6 +100,10 @@ module.exports = function(qc, opts) {
       relX = (((args[0] - targetX) / targetWidth) * MAXVAL) | 0;
       relY = (((args[1] - targetY) / targetHeight) * MAXVAL) | 0;
 
+      // emit the original event so we can tweak if required
+      emitter.emit(args[2].type, args[0], args[1], args[3]);
+
+      // send the data
       channels.forEach(function(dc) {
         // send the mouse data payload
         dc.send(new Uint16Array([
