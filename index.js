@@ -1,7 +1,6 @@
 /* jshint node: true */
 'use strict';
 
-var bufferedchannel = require('rtc-bufferedchannel');
 var point = require('point');
 var EventEmitter = require('events').EventEmitter;
 var throttle = require('cog/throttle');
@@ -42,6 +41,10 @@ module.exports = function(qc, opts) {
   var targetHeight = 0;
   var MAXVAL = Math.pow(2, 16) - 1;
   var thottleDelay = (opts || {}).throttleDelay || 10;
+  var channelOpts = (opts || {}).channelOpts || {
+    ordered: true,
+    maxRetransmits: 0
+  };
 
   function updateTargetBounds() {
     var rect = currentTarget && currentTarget.getBoundingClientRect();
@@ -63,12 +66,12 @@ module.exports = function(qc, opts) {
   }
 
   function handleNewChannel(dc, id) {
-    var channel = bufferedchannel(dc, { retry: false });
-
-    channels.push(channel);
+    channels.push(dc);
     peers.push(id);
 
-    channel.on('data', function(payload) {
+    dc.onmessage = function(evt) {
+      var payload = new Uint16Array(evt.data);
+
       emitter.emit(
         'data',
         id,
@@ -76,10 +79,12 @@ module.exports = function(qc, opts) {
         (payload[1] / MAXVAL * targetWidth) | 0,
         (payload[2] / MAXVAL * targetHeight) | 0
       );
-    });
+    };
   }
 
   function removeCursor(id) {
+    // emit a remove event
+    emitter.emit('remove', id);
   }
 
   function takePoint(args) {
@@ -104,14 +109,19 @@ module.exports = function(qc, opts) {
       emitter.emit(args[2].type, args[0], args[1], args[3]);
 
       // send the data
-      channels.forEach(function(dc) {
-        // send the mouse data payload
-        dc.send(new Uint16Array([
-          code,
-          relX,
-          relY
-        ]));
-      })
+      channels.forEach(function(dc, idx) {
+        try {
+          // send the mouse data payload
+          dc.send(new Uint16Array([
+            code,
+            relX,
+            relY
+          ]));
+        }
+        catch (e) {
+          console.warn('couldn\'t send cursor to peer: ' + peers[idx], e);
+        }
+      });
     }
   }
 
@@ -133,6 +143,9 @@ module.exports = function(qc, opts) {
       stop(); 
     };
 
+    // update the target bounds
+    updateTargetBounds();
+
     return emitter;
   };
 
@@ -146,7 +159,7 @@ module.exports = function(qc, opts) {
   }
 
   // create the data channel and listen for peer data channels opening
-  qc.createDataChannel('cursor')
+  qc.createDataChannel('cursor', channelOpts)
     .on('cursor:open', handleNewChannel)
     .on('cursor:close', removeCursor);
 
