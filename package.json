@@ -26,8 +26,8 @@
   },
   "homepage": "https://github.com/rtc-io/rtc-sharedcursor",
   "devDependencies": {
-    "rtc-quickconnect": "^0.12.0",
-    "crel": "~1.1.1"
+    "rtc-quickconnect": "^1",
+    "crel": "^1"
   },
   "dependencies": {
     "cog": "~0.5.1",
