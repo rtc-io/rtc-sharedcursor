@@ -22,7 +22,7 @@ var eventCodes = [
 
   <<< examples/simple.js
 
-  Running the example in a few different windows, should display 
+  Running the example in a few different windows, should display
   something similar to what is shown below:
 
   ![Screenshot](https://raw.github.com/rtc-io/rtc-sharedcursor/master/screenshot.png)
@@ -65,7 +65,7 @@ module.exports = function(qc, opts) {
     }
   }
 
-  function handleNewChannel(dc, id) {
+  function handleNewChannel(id, dc) {
     channels.push(dc);
     peers.push(id);
 
@@ -83,6 +83,14 @@ module.exports = function(qc, opts) {
   }
 
   function removeCursor(id) {
+    // find the channel that has been removed
+    var peerIdx = peers.indexOf(id);
+
+    if (peerIdx >= 0) {
+      peers.splice(peerIdx, 1);
+      channels.splice(peerIdx, 1);
+    }
+
     // emit a remove event
     emitter.emit('remove', id);
   }
@@ -140,7 +148,7 @@ module.exports = function(qc, opts) {
 
     // patch in the detach handler
     emitter.detach = function() {
-      stop(); 
+      stop();
     };
 
     // update the target bounds
@@ -160,8 +168,8 @@ module.exports = function(qc, opts) {
 
   // create the data channel and listen for peer data channels opening
   qc.createDataChannel('cursor', channelOpts)
-    .on('cursor:open', handleNewChannel)
-    .on('cursor:close', removeCursor);
+    .on('channel:opened:cursor', handleNewChannel)
+    .on('channel:closed:cursor', removeCursor);
 
   return emitter;
 };
