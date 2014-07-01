@@ -2,7 +2,7 @@
 'use strict';
 
 var point = require('point');
-var EventEmitter = require('events').EventEmitter;
+var EventEmitter = require('eventemitter3');
 var throttle = require('cog/throttle');
 var eventCodes = [
   'over',
