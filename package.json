@@ -30,7 +30,7 @@
     "crel": "^1"
   },
   "dependencies": {
-    "cog": "~0.5.1",
+    "cog": "^1.0.0",
     "eventemitter3": "^0.1.2",
     "point": "~0.3.0"
   }
