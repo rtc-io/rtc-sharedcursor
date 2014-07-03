@@ -4,6 +4,7 @@
 var point = require('point');
 var EventEmitter = require('eventemitter3');
 var throttle = require('cog/throttle');
+var relativ = require('relativ');
 var eventCodes = [
   'over',
   'start',
@@ -35,20 +36,20 @@ module.exports = function(qc, opts) {
   var channels = [];
   var peers = [];
   var currentTarget;
-  var targetX = 0;
-  var targetY = 0;
-  var targetWidth = 0;
-  var targetHeight = 0;
-  var MAXVAL = Math.pow(2, 16) - 1;
   var thottleDelay = (opts || {}).throttleDelay || 10;
   var channelOpts = (opts || {}).channelOpts || {
     ordered: true,
     maxRetransmits: 0
   };
+  var transform;
 
   function updateTargetBounds() {
     var rect = currentTarget && currentTarget.getBoundingClientRect();
     var offsetTarget = currentTarget;
+    var targetX = 0;
+    var targetY = 0;
+    var targetWidth = 0;
+    var targetHeight = 0;
 
     // get the width and height from the client bounding rect
     targetWidth = rect ? rect.width : 0;
@@ -63,6 +64,8 @@ module.exports = function(qc, opts) {
 
       offsetTarget = offsetTarget.offsetParent;
     }
+
+    transform = relativ([targetX, targetY, targetWidth, targetHeight]);
   }
 
   function handleNewChannel(id, dc) {
@@ -71,13 +74,18 @@ module.exports = function(qc, opts) {
 
     dc.onmessage = function(evt) {
       var payload = new Uint16Array(evt.data);
+      var unpacked = transform && transform.unpack([payload[1], payload[2]]);
+
+      if (! unpacked) {
+        return;
+      }
 
       emitter.emit(
         'data',
         id,
         eventCodes[payload[0]],
-        (payload[1] / MAXVAL * targetWidth) | 0,
-        (payload[2] / MAXVAL * targetHeight) | 0
+        unpacked[0],
+        unpacked[1]
       );
     };
   }
@@ -97,8 +105,7 @@ module.exports = function(qc, opts) {
 
   function takePoint(args) {
     var code;
-    var relX;
-    var relY;
+    var coords;
 
     if (! args) {
       return;
@@ -110,8 +117,7 @@ module.exports = function(qc, opts) {
       updateTargetBounds();
 
       // calculate the relative x and y
-      relX = (((args[0] - targetX) / targetWidth) * MAXVAL) | 0;
-      relY = (((args[1] - targetY) / targetHeight) * MAXVAL) | 0;
+      coords = transform(args);
 
       // emit the original event so we can tweak if required
       emitter.emit(args[2].type, args[0], args[1], args[3]);
@@ -122,8 +128,8 @@ module.exports = function(qc, opts) {
           // send the mouse data payload
           dc.send(new Uint16Array([
             code,
-            relX,
-            relY
+            coords[0],
+            coords[1]
           ]));
         }
         catch (e) {
