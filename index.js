@@ -72,6 +72,7 @@ module.exports = function(qc, opts) {
     channels.push(dc);
     peers.push(id);
 
+    dc.binaryType = 'arraybuffer';
     dc.onmessage = function(evt) {
       var payload = new Uint16Array(evt.data);
       var unpacked = transform && transform.unpack([payload[1], payload[2]]);
