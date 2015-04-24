@@ -4,7 +4,6 @@
   "description": "WebRTC P2P Shared Cursor Implementation via Data Channels (requires rtc-quickconnect)",
   "main": "index.js",
   "scripts": {
-    "test": "",
     "gendocs": "gendocs > README.md"
   },
   "repository": {
