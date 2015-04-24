@@ -1,8 +1,13 @@
 var quickconnect = require('rtc-quickconnect');
-var sharedcursor = require('../');
 var crel = require('crel');
-var qc = quickconnect('http://rtc.io/switchboard/');
-var cursor = sharedcursor(qc);
+
+// initialise quickconnect
+var qc = quickconnect('https://switchboard.rtc.io/', {
+  room: 'test:sharedcursor'
+});
+
+// create the shared cursor
+var cursor = require('..')(qc);
 
 // create some test elements
 var elements = [
@@ -28,8 +33,8 @@ context.fillRect(0, 0, target.width, target.height);
 // valid DOM bounds
 cursor.attach(target);
 
+// draw on the target
 cursor.on('data', function(id, type, x, y) {
-  // draw on the target
   context.fillStyle = 'rgb(200, 200, 200)';
   context.fillRect(0, 0, target.width, target.height);
   context.fillStyle = type === 'move' ? 'green' : 'red';
