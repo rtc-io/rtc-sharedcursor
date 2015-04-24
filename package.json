@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "cog": "^1.0.0",
-    "eventemitter3": "^0.1.2",
+    "eventemitter3": "^1.0.1",
     "point": "^1.2.0",
     "relativ": "^2.0.0"
   }
