@@ -7,16 +7,21 @@ peers across a data channel connection.
 
 [![NPM](https://nodei.co/npm/rtc-sharedcursor.png)](https://nodei.co/npm/rtc-sharedcursor/)
 
-![experimental](https://img.shields.io/badge/stability-experimental-red.svg)
+[![unstable](https://img.shields.io/badge/stability-unstable-yellowgreen.svg)](https://github.com/dominictarr/stability#unstable) [![bitHound Score](https://www.bithound.io/github/rtc-io/rtc-sharedcursor/badges/score.svg)](https://www.bithound.io/github/rtc-io/rtc-sharedcursor) 
 
 ## Example Usage
 
 ```js
 var quickconnect = require('rtc-quickconnect');
-var sharedcursor = require('rtc-sharedcursor');
 var crel = require('crel');
-var qc = quickconnect('http://rtc.io/switchboard/');
-var cursor = sharedcursor(qc);
+
+// initialise quickconnect
+var qc = quickconnect('https://switchboard.rtc.io/', {
+  room: 'test:sharedcursor'
+});
+
+// create the shared cursor
+var cursor = require('rtc-sharedcursor')(qc);
 
 // create some test elements
 var elements = [
@@ -42,16 +47,17 @@ context.fillRect(0, 0, target.width, target.height);
 // valid DOM bounds
 cursor.attach(target);
 
+// draw on the target
 cursor.on('data', function(id, type, x, y) {
-  // draw on the target
   context.fillStyle = 'rgb(200, 200, 200)';
   context.fillRect(0, 0, target.width, target.height);
   context.fillStyle = type === 'move' ? 'green' : 'red';
   context.fillRect(x - 5, y - 5, 10, 10);
 });
+
 ```
 
-Running the example in a few different windows, should display 
+Running the example in a few different windows, should display
 something similar to what is shown below:
 
 ![Screenshot](https://raw.github.com/rtc-io/rtc-sharedcursor/master/screenshot.png)
@@ -60,7 +66,7 @@ something similar to what is shown below:
 
 ### Apache 2.0
 
-Copyright 2014 National ICT Australia Limited (NICTA)
+Copyright 2015 National ICT Australia Limited (NICTA)
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
